@@ -4,4 +4,6 @@
     <string name="x_diklik">Mood %1$s diklik!</string>
     <string name="tambah_catatan">Tambah Mood 🌼</string>
     <string name="belum_bisa">Belum bisa tambah catatan mood</string>
+    <string name="mood_hari_ini">Mood kamu hari ini apa? 😊</string>
+    <string name="kenapa_merasa">Kenapa kamu merasa begitu? 📝</string>
 </resources>
