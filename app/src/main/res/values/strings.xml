@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Mood Tracker 🐰💖</string>
+    <string name="list_kosong">Belum ada mood yang tercatat 🌧️ </string>
+    <string name="x_diklik">Mood %1$s diklik!</string>
+    <string name="tambah_catatan">Tambah Mood 🌼</string>
+    <string name="belum_bisa">Belum bisa tambah catatan mood</string>
+</resources>
