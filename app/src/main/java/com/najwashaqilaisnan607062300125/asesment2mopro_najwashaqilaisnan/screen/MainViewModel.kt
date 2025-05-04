@@ -7,7 +7,7 @@ class MainViewModel : ViewModel() {
     val data = listOf(
         Catatan(
             id = 1L,
-            moodLevel = "Bahagia",
+            moodLevel = "Senang",
             deskripsi = "Hari ini cerah banget, aku jalan-jalan sore sambil denger lagu favorit.",
             tanggal = "2025-01-01 10:00:00"
         ),
@@ -19,25 +19,25 @@ class MainViewModel : ViewModel() {
         ),
         Catatan(
             id = 3L,
-            moodLevel = "Semangat",
+            moodLevel = "Senang",
             deskripsi = "Banyak progress tugas hari ini, rasanya puas banget!",
             tanggal = "2025-01-03 09:30:00"
         ),
         Catatan(
             id = 4L,
-            moodLevel = "Bingung",
+            moodLevel = "Kesal",
             deskripsi = "Ada bug yang bikin pusing, tapi pelan-pelan mulai ngerti.",
             tanggal = "2025-01-04 14:15:00"
         ),
         Catatan(
             id = 5L,
-            moodLevel = "Capek",
+            moodLevel = "Kesal",
             deskripsi = "Hari ini full kegiatan, rasanya pengen rebahan seharian.",
             tanggal = "2025-01-05 17:10:00"
         ),
         Catatan(
             id = 6L,
-            moodLevel = "Tenang",
+            moodLevel = "Senang",
             deskripsi = "Meditasi sebentar bikin pikiran lebih damai dan jernih.",
             tanggal = "2025-01-06 20:30:00"
         ),
@@ -48,4 +48,7 @@ class MainViewModel : ViewModel() {
             tanggal = "2025-01-07 07:20:00"
         )
     )
+    fun getCatatan(id:Long):Catatan?{
+        return data.find { it.id==id }
+    }
 }

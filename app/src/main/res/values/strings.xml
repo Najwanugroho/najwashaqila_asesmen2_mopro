@@ -6,4 +6,7 @@
     <string name="belum_bisa">Belum bisa tambah catatan mood</string>
     <string name="mood_hari_ini">Mood kamu hari ini apa? 😊</string>
     <string name="kenapa_merasa">Kenapa kamu merasa begitu? 📝</string>
+    <string name="kembali">Kembali</string>
+    <string name="edit_catatan">Ubah Mood</string>
+    <string name="Simpan">Simpan</string>
 </resources>

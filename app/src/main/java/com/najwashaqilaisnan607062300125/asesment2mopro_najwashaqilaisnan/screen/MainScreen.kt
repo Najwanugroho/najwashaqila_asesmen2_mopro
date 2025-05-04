@@ -33,14 +33,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.R
 import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.model.Catatan
+import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.navigation.Screen
 import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.ui.theme.Asesment2mopro_najwashaqilaisnanTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(){
-    val context= LocalContext.current
+fun MainScreen(navController: NavHostController) {
     Scaffold (
         topBar = {
             TopAppBar(
@@ -56,11 +58,10 @@ fun MainScreen(){
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    Toast.makeText(context, R.string.belum_bisa, Toast.LENGTH_SHORT).show()
-
-                }
-                , containerColor = Color(0xFFCE93D8)
-            ) {
+                    navController.navigate(Screen.FormBaru.route)
+                },containerColor = Color(0xFFCE93D8)
+            )
+            {
                 Icon(
                     imageVector = Icons.Filled.Add,
                     contentDescription = stringResource(R.string.tambah_catatan),
@@ -69,15 +70,14 @@ fun MainScreen(){
             }
         }
     ){ innerPadding ->
-        ScreenContent(Modifier.padding(innerPadding))
+        ScreenContent(Modifier.padding(innerPadding),navController)
     }
 }
 
 @Composable
-fun ScreenContent(modifier: Modifier = Modifier){
+fun ScreenContent(modifier: Modifier = Modifier, navController: NavHostController){
     val viewModel:MainViewModel= viewModel()
     val data=viewModel.data
-    val context= LocalContext.current
     if (data.isEmpty()){
         Column (
             modifier = modifier.fillMaxSize().padding(16.dp),
@@ -94,8 +94,7 @@ fun ScreenContent(modifier: Modifier = Modifier){
         ){
             items(data){
                 ListItem(catatan = it){
-                    val pesan=context.getString(R.string.x_diklik,it.moodLevel)
-                    Toast.makeText(context,pesan, Toast.LENGTH_SHORT).show()
+                    navController.navigate(Screen.FormUbah.withId(it.id))
                 }
                 HorizontalDivider()
             }
@@ -132,6 +131,6 @@ fun ListItem(catatan: Catatan, onClick:()-> Unit){
 @Composable
 fun MainScreenPreview() {
     Asesment2mopro_najwashaqilaisnanTheme {
-        MainScreen()
+        rememberNavController()
     }
 }
