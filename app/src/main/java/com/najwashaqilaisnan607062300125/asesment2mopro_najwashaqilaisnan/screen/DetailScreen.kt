@@ -64,6 +64,7 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
 
     var moodLevel by remember { mutableStateOf("") }
     var deskripsi by remember { mutableStateOf("") }
+    var showDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(true) {
         if (id != null) {
@@ -121,8 +122,7 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
 
                     if (id != null) {
                         DeleteAction {
-                            viewModel.delete(id)
-                            navController.popBackStack()
+                            showDialog=true
                         }
                     }
                 }
@@ -136,6 +136,14 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
             onDescChange = { deskripsi = it },
             modifier = Modifier.padding(padding)
         )
+        if (id !=null&& showDialog){
+            DisplayAlertDialog(
+                onDismissRequest = {showDialog=false}) {
+                showDialog=false
+                viewModel.delete(id)
+                navController.popBackStack()
+            }
+        }
     }
 }
 
@@ -182,11 +190,9 @@ fun FormCatatan(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(
-            text = stringResource(R.string.mood_hari_ini),
+        Text(text = stringResource(R.string.mood_hari_ini),
             color = Color(0xFF6A1B9A),
-            style = MaterialTheme.typography.titleMedium
-        )
+            style = MaterialTheme.typography.titleMedium)
 
         Row(
             modifier = Modifier
@@ -215,7 +221,7 @@ fun FormCatatan(
             keyboardOptions = KeyboardOptions.Default.copy(
                 capitalization = KeyboardCapitalization.Sentences
             ),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxSize()
         )
     }
 }
