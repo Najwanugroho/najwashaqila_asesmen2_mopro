@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.najwashaqilaisnan607062300125.asesment2_najwashaqilaisnan_mopro.database.CatatanDao
 import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.model.Catatan
 
 

@@ -1,10 +1,11 @@
-package com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.database
+package com.najwashaqilaisnan607062300125.asesment2_najwashaqilaisnan_mopro.database
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
 import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.model.Catatan
+
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -18,4 +19,10 @@ interface CatatanDao {
 
     @Query("SELECT * FROM catatan ORDER BY tanggal DESC")
     fun getCatatan(): Flow<List<Catatan>>
+
+    @Query("SELECT * FROM catatan WHERE id = :id")
+    suspend fun getCatatanById(id: Long): Catatan?
+
+    @Query("DELETE FROM catatan WHERE id = :id")
+    suspend fun deleteById(id: Long)
 }
