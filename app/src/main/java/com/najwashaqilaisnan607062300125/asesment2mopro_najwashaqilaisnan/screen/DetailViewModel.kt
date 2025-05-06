@@ -1,3 +1,4 @@
+// screen/DetailViewModel.kt
 package com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.screen
 
 import androidx.lifecycle.ViewModel
@@ -5,13 +6,12 @@ import androidx.lifecycle.viewModelScope
 import com.najwashaqilaisnan607062300125.asesment2_najwashaqilaisnan_mopro.database.CatatanDao
 import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.model.Catatan
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.util.*
 
 class DetailViewModel(private val dao: CatatanDao) : ViewModel() {
-
     private val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US)
 
     fun insert(moodLevel: String, deskripsi: String) {
@@ -20,15 +20,12 @@ class DetailViewModel(private val dao: CatatanDao) : ViewModel() {
             moodLevel = moodLevel,
             deskripsi = deskripsi
         )
-
         viewModelScope.launch(Dispatchers.IO) {
             dao.insert(catatan)
         }
     }
 
-    suspend fun getCatatan(id: Long): Catatan? {
-        return dao.getCatatanById(id)
-    }
+    suspend fun getCatatan(id: Long): Catatan? = dao.getCatatanById(id)
 
     fun update(id: Long, moodLevel: String, deskripsi: String) {
         val catatan = Catatan(
@@ -37,7 +34,6 @@ class DetailViewModel(private val dao: CatatanDao) : ViewModel() {
             moodLevel = moodLevel,
             deskripsi = deskripsi
         )
-
         viewModelScope.launch(Dispatchers.IO) {
             dao.update(catatan)
         }
@@ -48,4 +44,13 @@ class DetailViewModel(private val dao: CatatanDao) : ViewModel() {
             dao.deleteById(id)
         }
     }
+
+    fun restore(id: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            dao.restoreById(id)
+        }
+    }
+
+    fun getDeletedItems(): Flow<List<Catatan>> = dao.getDeletedItems()
+
 }

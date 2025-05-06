@@ -9,5 +9,7 @@ data class Catatan(
     val id: Long = 0L,
     val moodLevel: String,
     val deskripsi: String,
-    val tanggal: String
+    val tanggal: String,
+    val isDeleted: Boolean = false,
+    val deletedAt: String? = null
 )

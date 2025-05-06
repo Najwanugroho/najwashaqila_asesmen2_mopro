@@ -10,6 +10,7 @@ import androidx.navigation.navArgument
 import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.screen.DetailScreen
 import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.screen.KEY_ID_CATATAN
 import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.screen.MainScreen
+import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.screen.RecycleBinScreen
 
 @Composable
 fun SetupNavGraph(navController: NavHostController = rememberNavController()){
@@ -23,6 +24,10 @@ fun SetupNavGraph(navController: NavHostController = rememberNavController()){
         composable(route = Screen.FormBaru.route){
             DetailScreen(navController)
         }
+        composable(route = Screen.RecycleBin.route) {
+            RecycleBinScreen(navController)
+        }
+
         composable(
             route = Screen.FormUbah.route,
             arguments = listOf(

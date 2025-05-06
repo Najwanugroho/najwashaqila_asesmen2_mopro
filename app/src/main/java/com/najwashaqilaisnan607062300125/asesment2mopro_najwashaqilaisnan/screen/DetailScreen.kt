@@ -5,12 +5,9 @@ import android.widget.Toast
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,6 +26,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -50,6 +50,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.R
 import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.database.CatatanDb
+import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.model.Catatan
 import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.ui.theme.Asesment2mopro_najwashaqilaisnanTheme
 import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.util.ViewModelFactory
 
@@ -62,19 +63,26 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
     val factory = ViewModelFactory(db.dao)
     val viewModel: DetailViewModel = viewModel(factory = factory)
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    var itemToDelete by remember { mutableStateOf<Catatan?>(null) }
+
+
     var moodLevel by remember { mutableStateOf("") }
     var deskripsi by remember { mutableStateOf("") }
     var showDialog by remember { mutableStateOf(false) }
+    var catatan by remember { mutableStateOf<Catatan?>(null) }
 
     LaunchedEffect(true) {
         if (id != null) {
             val data = viewModel.getCatatan(id)
+            catatan = data
             data?.let {
                 moodLevel = it.moodLevel
                 deskripsi = it.deskripsi
             }
         }
     }
+
 
     Scaffold(
         topBar = {
@@ -138,10 +146,27 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
         )
         if (id !=null&& showDialog){
             DisplayAlertDialog(
-                onDismissRequest = {showDialog=false}) {
-                showDialog=false
+                onDismissRequest = { showDialog = false }) {
+                showDialog = false
+                catatan?.let {
+                    itemToDelete = Catatan(id = id, moodLevel = moodLevel, deskripsi = deskripsi, tanggal = it.tanggal)
+                }
                 viewModel.delete(id)
                 navController.popBackStack()
+            }
+        }
+
+        itemToDelete?.let { item ->
+            LaunchedEffect(item) {
+                val result = snackbarHostState.showSnackbar(
+                    message = "${item.moodLevel} dihapus",
+                    actionLabel = "UNDO",
+                    duration = SnackbarDuration.Long
+                )
+                if (result == SnackbarResult.ActionPerformed) {
+                    viewModel.restore(item.id)
+                }
+                itemToDelete = null
             }
         }
     }
