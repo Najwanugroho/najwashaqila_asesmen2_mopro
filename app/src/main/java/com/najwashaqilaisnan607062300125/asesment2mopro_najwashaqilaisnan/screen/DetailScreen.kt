@@ -1,20 +1,28 @@
 package com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.screen
 
 import android.content.res.Configuration
+import android.widget.Toast
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -45,56 +53,77 @@ import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.databa
 import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.ui.theme.Asesment2mopro_najwashaqilaisnanTheme
 import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.util.ViewModelFactory
 
-const val KEY_ID_CATATAN="idCatatan"
-
+const val KEY_ID_CATATAN = "idCatatan"
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailScreen(navController: NavHostController, id: Long? = null){
+fun DetailScreen(navController: NavHostController, id: Long? = null) {
     val context = LocalContext.current
     val db = CatatanDb.getInstance(context)
     val factory = ViewModelFactory(db.dao)
-    val viewModel: MainViewModel = viewModel(factory = factory)
-
+    val viewModel: DetailViewModel = viewModel(factory = factory)
 
     var moodLevel by remember { mutableStateOf("") }
     var deskripsi by remember { mutableStateOf("") }
 
-    LaunchedEffect(Unit) {
-        if (id==null) return@LaunchedEffect
-        val data=viewModel.getCatatan(id)?:return@LaunchedEffect
-        moodLevel=data.moodLevel
-        deskripsi=data.deskripsi
+    LaunchedEffect(true) {
+        if (id != null) {
+            val data = viewModel.getCatatan(id)
+            data?.let {
+                moodLevel = it.moodLevel
+                deskripsi = it.deskripsi
+            }
+        }
     }
-    Scaffold (
+
+    Scaffold(
         topBar = {
             TopAppBar(
                 navigationIcon = {
-                    IconButton(onClick = {navController.popBackStack()}) {
+                    IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.kembali),
                             tint = Color(0xFF6A1B9A)
+
                         )
                     }
                 },
-                title={
-                    if(id==null)
-                        Text(text = stringResource(id=R.string.tambah_catatan))
-                    else
-                        Text(text = stringResource(id=R.string.edit_catatan))
-
+                title = {
+                    Text(
+                        text = if (id == null)
+                            stringResource(R.string.tambah_mood)
+                        else
+                            stringResource(R.string.edit_mood),
+                        color = Color(0xFF6A1B9A)
+                    )
                 },
-                colors= TopAppBarDefaults.mediumTopAppBarColors(
+                colors = TopAppBarDefaults.mediumTopAppBarColors(
                     containerColor = Color(0xFFE1BEE7),
                     titleContentColor = Color(0xFF6A1B9A),
                 ),
                 actions = {
-                    IconButton(onClick = {navController.popBackStack()}) {
+                    IconButton(onClick = {
+                        if (moodLevel.isBlank() || deskripsi.isBlank()) {
+                            Toast.makeText(context, context.getString(R.string.isi_dulu), Toast.LENGTH_LONG).show()
+                            return@IconButton
+                        }
+                        if (id == null) viewModel.insert(moodLevel, deskripsi)
+                        else viewModel.update(id, moodLevel, deskripsi)
+
+                        navController.popBackStack()
+                    }) {
                         Icon(
                             imageVector = Icons.Outlined.Check,
-                            contentDescription = stringResource(R.string.Simpan),
-                            tint = Color(0xFF6A1B9A)
+                            contentDescription = stringResource(R.string.simpan_mood),
+                            tint = MaterialTheme.colorScheme.primary
                         )
+                    }
+
+                    if (id != null) {
+                        DeleteAction {
+                            viewModel.delete(id)
+                            navController.popBackStack()
+                        }
                     }
                 }
             )
@@ -107,8 +136,33 @@ fun DetailScreen(navController: NavHostController, id: Long? = null){
             onDescChange = { deskripsi = it },
             modifier = Modifier.padding(padding)
         )
+    }
+}
+
+@Composable
+fun DeleteAction(delete: () -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+
+    IconButton(onClick = { expanded = true }) {
+        Icon(
+            imageVector = Icons.Filled.MoreVert,
+            contentDescription = stringResource(R.string.lainnya),
+            tint = MaterialTheme.colorScheme.primary
+        )
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            DropdownMenuItem(
+                text = { Text(text = stringResource(R.string.hapus)) },
+                onClick = {
+                    expanded = false
+                    delete()
+                }
+            )
         }
     }
+}
 
 
 @Composable
@@ -120,6 +174,7 @@ fun FormCatatan(
     modifier: Modifier = Modifier
 ) {
     val moodOptions = listOf("Senang", "Sedih", "Kesal", "Marah")
+    val scrollState = rememberScrollState()
 
     Column(
         modifier = modifier
@@ -127,13 +182,17 @@ fun FormCatatan(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Text(text = stringResource(R.string.mood_hari_ini),
+        Text(
+            text = stringResource(R.string.mood_hari_ini),
             color = Color(0xFF6A1B9A),
-            style = MaterialTheme.typography.titleMedium)
+            style = MaterialTheme.typography.titleMedium
+        )
 
-        Row (
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxWidth()
+        Row(
+            modifier = Modifier
+                .horizontalScroll(scrollState)
+                .padding(bottom = 8.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             moodOptions.forEach { mood ->
                 Button(
@@ -142,14 +201,12 @@ fun FormCatatan(
                         containerColor = if (moodLevel == mood) Color(0xFF6A1B9A) else Color(0xFFFCE4EC)
                     ),
                     shape = RoundedCornerShape(50),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                    modifier = Modifier.weight(1f)
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
                 ) {
                     Text(text = mood)
                 }
             }
         }
-
 
         OutlinedTextField(
             value = desc,
@@ -158,7 +215,7 @@ fun FormCatatan(
             keyboardOptions = KeyboardOptions.Default.copy(
                 capitalization = KeyboardCapitalization.Sentences
             ),
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }

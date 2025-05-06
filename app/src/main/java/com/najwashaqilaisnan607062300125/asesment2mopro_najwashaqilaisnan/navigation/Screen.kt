@@ -5,7 +5,8 @@ import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.screen
 sealed class Screen(val route: String) {
     data object Home : Screen("mainScreen")
     data object FormBaru: Screen("detailScreen")
-    data object FormUbah: Screen("detailScreen/{$KEY_ID_CATATAN}") {
-        fun withId(id: Long): String = "detailScreen/$id"
+    data object FormUbah: Screen("detailScreen/{$KEY_ID_CATATAN}"){
+        fun withId(id:Long)="detailScreen/$id"
     }
+
 }
