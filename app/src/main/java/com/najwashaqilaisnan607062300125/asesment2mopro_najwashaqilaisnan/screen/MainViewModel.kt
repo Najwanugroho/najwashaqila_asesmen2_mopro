@@ -11,11 +11,7 @@ import kotlinx.coroutines.flow.stateIn
 class MainViewModel(dao: CatatanDao) : ViewModel() {
     val data: StateFlow<List<Catatan>> = dao.getCatatan().stateIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(),
+        started = SharingStarted.WhileSubscribed(5000L),
         initialValue = emptyList()
     )
-
-    fun getCatatan(id: Long): Catatan? {
-        return data.value.find { it.id == id }
-    }
 }

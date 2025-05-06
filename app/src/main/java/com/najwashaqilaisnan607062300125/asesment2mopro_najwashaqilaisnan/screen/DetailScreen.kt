@@ -116,7 +116,7 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
                         Icon(
                             imageVector = Icons.Outlined.Check,
                             contentDescription = stringResource(R.string.simpan_mood),
-                            tint = MaterialTheme.colorScheme.primary
+                            tint =  Color(0xFF6A1B9A)
                         )
                     }
 
@@ -155,7 +155,7 @@ fun DeleteAction(delete: () -> Unit) {
         Icon(
             imageVector = Icons.Filled.MoreVert,
             contentDescription = stringResource(R.string.lainnya),
-            tint = MaterialTheme.colorScheme.primary
+            tint =  Color(0xFF6A1B9A)
         )
         DropdownMenu(
             expanded = expanded,
@@ -204,7 +204,7 @@ fun FormCatatan(
                 Button(
                     onClick = { onMoodChange(mood) },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (moodLevel == mood) Color(0xFF6A1B9A) else Color(0xFFFCE4EC)
+                        containerColor = if (moodLevel == mood) Color(0xFFFFB6C1) else Color(0xFFFCE4EC)
                     ),
                     shape = RoundedCornerShape(50),
                     contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)

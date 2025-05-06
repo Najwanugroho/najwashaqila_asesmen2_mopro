@@ -1,40 +1,20 @@
 package com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.screen
 
 import android.content.res.Configuration
-import android.widget.Toast
-import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -53,6 +33,7 @@ import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.databa
 import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.model.Catatan
 import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.navigation.Screen
 import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.ui.theme.Asesment2mopro_najwashaqilaisnanTheme
+import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.util.SettingsDataStore
 import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.util.ViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -61,10 +42,8 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(navController: NavHostController) {
-    var showlist by remember { mutableStateOf(true) }
-    val pastelLavender = Color(0xFFE6E6FA)
-    val pastelPink = Color(0xFFFFD1DC)
-    val pastelText = Color(0xFF6A5ACD)
+    val dataStore = SettingsDataStore(LocalContext.current)
+    val showList by dataStore.layoutFlow.collectAsState(true)
 
     Scaffold(
         topBar = {
@@ -72,30 +51,29 @@ fun MainScreen(navController: NavHostController) {
                 title = {
                     Text(
                         text = stringResource(id = R.string.app_name),
-                        color = pastelText,
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold
-                        )
+                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
                     )
                 },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
-                    containerColor = pastelLavender,
-                    titleContentColor = pastelText,
+                    containerColor = Color(0xFFE1BEE7),
+                    titleContentColor = Color(0xFF6A1B9A),
                 ),
                 actions = {
                     IconButton(onClick = {
-                        showlist=!showlist
+                        CoroutineScope(Dispatchers.IO).launch {
+                            dataStore.saveLayout(!showList)
+                        }
                     }) {
                         Icon(
                             painter = painterResource(
-                                if (showlist)R.drawable.baseline_grid_view_24
+                                if (showList) R.drawable.baseline_grid_view_24
                                 else R.drawable.baseline_view_list_24
                             ),
                             contentDescription = stringResource(
-                                if (showlist) R.string.grid
+                                if (showList) R.string.grid
                                 else R.string.list
                             ),
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = Color(0xFF957DAD) // lilac pastel
                         )
                     }
                 }
@@ -103,9 +81,10 @@ fun MainScreen(navController: NavHostController) {
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { navController.navigate(Screen.FormBaru.route) },
-                containerColor = pastelPink,
-                modifier = Modifier.padding(16.dp)
+                onClick = {
+                    navController.navigate(Screen.FormBaru.route)
+                },
+                containerColor = Color(0xFFFFC1CC) // pastel pink
             ) {
                 Icon(
                     imageVector = Icons.Filled.Add,
@@ -113,17 +92,14 @@ fun MainScreen(navController: NavHostController) {
                     tint = Color.White
                 )
             }
-        },
-        containerColor = Color(0xFFFDFD96).copy(alpha = 0.3f)
+        }
     ) { innerPadding ->
-        ScreenContent(Modifier.padding(innerPadding), navController)
+        ScreenContent(showList, Modifier.padding(innerPadding), navController)
     }
 }
 
 @Composable
-fun ScreenContent(modifier: Modifier = Modifier, navController: NavHostController) {
-    val pastelText = Color(0xFF6A5ACD)
-
+fun ScreenContent(showList: Boolean, modifier: Modifier = Modifier, navController: NavHostController) {
     val context = LocalContext.current
     val db = CatatanDb.getInstance(context)
     val factory = ViewModelFactory(db.dao)
@@ -132,26 +108,40 @@ fun ScreenContent(modifier: Modifier = Modifier, navController: NavHostControlle
 
     if (data.isEmpty()) {
         Column(
-            modifier = modifier.fillMaxSize().padding(16.dp),
+            modifier = modifier
+                .fillMaxSize()
+                .padding(16.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = stringResource(id = R.string.list_kosong),
-                color = pastelText.copy(alpha = 0.7f),
-                style = MaterialTheme.typography.bodyLarge
-            )
+            Text(text = stringResource(id = R.string.list_kosong))
         }
     } else {
-        LazyColumn(
-            modifier = modifier.fillMaxSize(),
-            contentPadding = PaddingValues(bottom = 84.dp)
-        ) {
-            items(data) { catatan ->
-                ListItem(catatan = catatan) {
-                    navController.navigate(Screen.FormUbah.withId(catatan.id))
+        if (showList) {
+            LazyColumn(
+                modifier = modifier.fillMaxSize(),
+                contentPadding = PaddingValues(bottom = 84.dp)
+            ) {
+                items(data) {
+                    ListItem(catatan = it) {
+                        navController.navigate(Screen.FormUbah.withId(it.id))
+                    }
+                    HorizontalDivider()
                 }
-                HorizontalDivider(color = Color(0xFFD8BFD8).copy(alpha = 0.3f))
+            }
+        } else {
+            LazyVerticalStaggeredGrid(
+                modifier = modifier.fillMaxSize(),
+                columns = StaggeredGridCells.Fixed(2),
+                verticalItemSpacing = 12.dp,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(12.dp, 12.dp, 12.dp, 100.dp)
+            ) {
+                items(data) {
+                    GridItem(catatan = it) {
+                        navController.navigate(Screen.FormUbah.withId(it.id))
+                    }
+                }
             }
         }
     }
@@ -159,65 +149,73 @@ fun ScreenContent(modifier: Modifier = Modifier, navController: NavHostControlle
 
 @Composable
 fun ListItem(catatan: Catatan, onClick: () -> Unit) {
-    val moodColor = when (catatan.moodLevel) {
-        "Senang" -> Color(0xFFC1E1C1)
-        "Sedih" -> Color(0xFFADD8E6)
-        "Kesal" -> Color(0xFFFFB6C1)
-        "Marah" -> Color(0xFFFFA07A)
-        else -> Color(0xFFD8BFD8)
-    }
-    val pastelText = Color(0xFF6A5ACD)
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() }
-            .padding(16.dp)
-            .background(Color.White, RoundedCornerShape(8.dp))
-            .padding(12.dp)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Row (
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box (
-                modifier = Modifier
-                    .background(moodColor, RoundedCornerShape(16.dp))
-                    .padding(horizontal = 12.dp, vertical = 4.dp)
-            ) {
-                Text(
-                    text = catatan.moodLevel,
-                    color = pastelText,
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold
-                    )
-                )
-            }
-
-            Text(
-                text = catatan.tanggal,
-                style = MaterialTheme.typography.labelSmall,
-                color = pastelText.copy(alpha = 0.7f)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
+        Text(
+            text = catatan.moodLevel,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFFBA68C8) // ungu muda
+        )
         Text(
             text = catatan.deskripsi,
-            color = pastelText.copy(alpha = 0.9f),
             maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.bodyMedium
+            overflow = TextOverflow.Ellipsis
+        )
+        Text(
+            text = catatan.tanggal,
+            style = MaterialTheme.typography.labelSmall
         )
     }
 }
+
+@Composable
+fun GridItem(catatan: Catatan, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFFFF6D5)
+        ),
+        border = BorderStroke(1.dp, Color(0xFFCE93D8)),
+        elevation = CardDefaults.cardElevation(4.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = catatan.moodLevel,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFFD48FB1) // pink pastel
+            )
+            Text(
+                text = catatan.deskripsi,
+                maxLines = 4,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = catatan.tanggal,
+                style = MaterialTheme.typography.labelSmall
+            )
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
 @Composable
 fun MainScreenPreview() {
     Asesment2mopro_najwashaqilaisnanTheme {
-        rememberNavController()
+        MainScreen(navController = rememberNavController())
     }
 }
