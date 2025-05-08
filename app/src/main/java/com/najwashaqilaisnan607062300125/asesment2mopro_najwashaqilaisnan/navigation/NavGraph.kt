@@ -32,11 +32,13 @@ fun SetupNavGraph(navController: NavHostController = rememberNavController(), is
         composable(
             route = Screen.FormUbah.route,
             arguments = listOf(
-                navArgument(KEY_ID_CATATAN){type =NavType.LongType}
+                navArgument(KEY_ID_CATATAN) { type = NavType.LongType }
             )
-        ){navBackStackEntry ->
-            val id =navBackStackEntry.arguments?.getLong(KEY_ID_CATATAN)
-            DetailScreen(navController = navController, isDarkTheme = isDarkTheme)
+        ) { navBackStackEntry ->
+            val id = navBackStackEntry.arguments?.getLong(KEY_ID_CATATAN)
+            DetailScreen(navController = navController, id = id, isDarkTheme = isDarkTheme)
         }
+
+
     }
 }
