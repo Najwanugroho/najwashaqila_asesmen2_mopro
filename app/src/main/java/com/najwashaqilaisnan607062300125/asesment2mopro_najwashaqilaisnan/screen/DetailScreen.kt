@@ -29,15 +29,19 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -57,7 +61,11 @@ import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.util.V
 const val KEY_ID_CATATAN = "idCatatan"
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailScreen(navController: NavHostController, id: Long? = null) {
+fun DetailScreen(
+    navController: NavHostController,
+    id: Long? = null,
+    isDarkTheme: MutableState<Boolean>
+) {
     val context = LocalContext.current
     val db = CatatanDb.getInstance(context)
     val factory = ViewModelFactory(db.dao)
@@ -65,7 +73,6 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
 
     val snackbarHostState = remember { SnackbarHostState() }
     var itemToDelete by remember { mutableStateOf<Catatan?>(null) }
-
 
     var moodLevel by remember { mutableStateOf("") }
     var deskripsi by remember { mutableStateOf("") }
@@ -83,7 +90,6 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
         }
     }
 
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -93,7 +99,6 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.kembali),
                             tint = Color(0xFF6A1B9A)
-
                         )
                     }
                 },
@@ -111,6 +116,18 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
                     titleContentColor = Color(0xFF6A1B9A),
                 ),
                 actions = {
+                    // ✅ Tambahkan tombol ubah tema
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(end = 8.dp)
+                    ) {
+                        Text("🌞 / 🌙")
+                        Switch(
+                            checked = isDarkTheme.value,
+                            onCheckedChange = { isDarkTheme.value = it }
+                        )
+                    }
+
                     IconButton(onClick = {
                         if (moodLevel.isBlank() || deskripsi.isBlank()) {
                             Toast.makeText(context, context.getString(R.string.isi_dulu), Toast.LENGTH_LONG).show()
@@ -130,7 +147,7 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
 
                     if (id != null) {
                         DeleteAction {
-                            showDialog=true
+                            showDialog = true
                         }
                     }
                 }
@@ -144,7 +161,7 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
             onDescChange = { deskripsi = it },
             modifier = Modifier.padding(padding)
         )
-        if (id !=null&& showDialog){
+        if (id != null && showDialog) {
             DisplayAlertDialog(
                 onDismissRequest = { showDialog = false }) {
                 showDialog = false
@@ -153,20 +170,6 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
                 }
                 viewModel.delete(id)
                 navController.popBackStack()
-            }
-        }
-
-        itemToDelete?.let { item ->
-            LaunchedEffect(item) {
-                val result = snackbarHostState.showSnackbar(
-                    message = "${item.moodLevel} dihapus",
-                    actionLabel = "UNDO",
-                    duration = SnackbarDuration.Long
-                )
-                if (result == SnackbarResult.ActionPerformed) {
-                    viewModel.restore(item.id)
-                }
-                itemToDelete = null
             }
         }
     }
@@ -254,8 +257,9 @@ fun FormCatatan(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
 @Composable
 fun DetailScreenPreview() {
-    Asesment2mopro_najwashaqilaisnanTheme {
-        DetailScreen(rememberNavController())
+    val isDark = rememberSaveable { mutableStateOf(false) }
+    Asesment2mopro_najwashaqilaisnanTheme(darkTheme = isDark.value) {
+        DetailScreen(navController = rememberNavController(), isDarkTheme = isDark)
     }
 }
 

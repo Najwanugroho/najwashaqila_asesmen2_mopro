@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -32,15 +33,18 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -68,7 +72,9 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navController: NavHostController) {
+fun MainScreen(navController: NavHostController,
+               isDarkTheme: MutableState<Boolean>
+) {
     val context = LocalContext.current
     val db = CatatanDb.getInstance(context)
     val factory = ViewModelFactory(db.dao)
@@ -78,7 +84,7 @@ fun MainScreen(navController: NavHostController) {
     var itemToDelete by remember { mutableStateOf<Catatan?>(null) }
 
     val dataStore = SettingsDataStore(context)
-    val showList by dataStore.layoutFlow.collectAsState(true)
+    val showList by dataStore.layoutFlow.collectAsState(initial = true)
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -95,28 +101,40 @@ fun MainScreen(navController: NavHostController) {
                     titleContentColor = Color(0xFF6A1B9A),
                 ),
                 actions = {
-                    IconButton(onClick = {
-                        CoroutineScope(Dispatchers.IO).launch {
-                            dataStore.saveLayout(!showList)
-                        }
-                    }) {
-                        Icon(
-                            painter = painterResource(
-                                if (showList) R.drawable.baseline_grid_view_24
-                                else R.drawable.baseline_view_list_24
-                            ),
-                            contentDescription = stringResource(
-                                if (showList) R.string.grid
-                                else R.string.list
-                            ),
-                            tint = Color(0xFF6A1B9A)
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(end = 12.dp)
+                    ) {
+                        Text("🌞 / 🌙")
+                        Switch(
+                            checked = isDarkTheme.value,
+                            onCheckedChange = { isDarkTheme.value = it }
                         )
+                        IconButton(
+                            onClick = {
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    dataStore.saveLayout(!showList)
+                                }
+                            }
+                        ) {
+                            Icon(
+                                painter = painterResource(
+                                    if (showList) R.drawable.baseline_grid_view_24
+                                    else R.drawable.baseline_view_list_24
+                                ),
+                                contentDescription = stringResource(
+                                    if (showList) R.string.grid
+                                    else R.string.list
+                                ),
+                                tint = Color(0xFF6A1B9A)
+                            )
+                        }
                     }
                 }
             )
         },
         floatingActionButton = {
-            Row (
+            Row(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(end = 16.dp, bottom = 16.dp)
@@ -133,7 +151,6 @@ fun MainScreen(navController: NavHostController) {
                         tint = Color.White
                     )
                 }
-
                 FloatingActionButton(
                     onClick = {
                         navController.navigate(Screen.FormBaru.route)
@@ -175,6 +192,7 @@ fun MainScreen(navController: NavHostController) {
         }
     }
 }
+
 
 
 @Composable
@@ -267,14 +285,21 @@ fun ListItem(catatan: Catatan, onClick: () -> Unit, onDelete: () -> Unit) {
 
 @Composable
 fun GridItem(catatan: Catatan, onClick: () -> Unit, onDelete: () -> Unit) {
+    val isDark = isSystemInDarkTheme()
+
+    val backgroundColor = if (isDark) Color(0xFF424242) else Color(0xFFFFF6D5)
+    val borderColor = if (isDark) Color(0xFFB39DDB) else Color(0xFFCE93D8)
+    val titleColor = if (isDark) Color(0xFFE1BEE7) else Color(0xFFD48FB1)
+    val textColor = if (isDark) Color(0xFFEEEEEE) else Color.Black
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() },
         colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFFFF6D5)
+            containerColor = backgroundColor
         ),
-        border = BorderStroke(1.dp, Color(0xFFCE93D8)),
+        border = BorderStroke(1.dp, borderColor),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(
@@ -286,16 +311,18 @@ fun GridItem(catatan: Catatan, onClick: () -> Unit, onDelete: () -> Unit) {
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFFD48FB1)
+                color = titleColor
             )
             Text(
                 text = catatan.deskripsi,
                 maxLines = 4,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
+                color = textColor
             )
             Text(
                 text = catatan.tanggal,
-                style = MaterialTheme.typography.labelSmall
+                style = MaterialTheme.typography.labelSmall,
+                color = textColor
             )
             Text(
                 text = "Hapus",
@@ -306,11 +333,15 @@ fun GridItem(catatan: Catatan, onClick: () -> Unit, onDelete: () -> Unit) {
     }
 }
 
+
 @Preview(showBackground = true)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
 @Composable
 fun MainScreenPreview() {
-    Asesment2mopro_najwashaqilaisnanTheme {
-        MainScreen(navController = rememberNavController())
+    val isDark = rememberSaveable { mutableStateOf(false) }
+
+    Asesment2mopro_najwashaqilaisnanTheme(darkTheme = isDark.value) {
+        MainScreen(navController = rememberNavController(), isDarkTheme = isDark)
     }
 }
+

@@ -23,7 +23,8 @@ import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.util.V
 @Composable
 fun RecycleBinScreen(
     navController: NavHostController,
-    viewModel: DetailViewModel = viewModel(factory = ViewModelFactory(CatatanDb.getInstance(LocalContext.current).dao))
+    viewModel: DetailViewModel = viewModel(factory = ViewModelFactory(CatatanDb.getInstance(LocalContext.current).dao)),
+
 ) {
     val deletedItems by viewModel.getDeletedItems().collectAsState(initial = emptyList())
 

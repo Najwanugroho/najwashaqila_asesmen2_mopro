@@ -1,6 +1,7 @@
 package com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -13,16 +14,16 @@ import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.screen
 import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.screen.RecycleBinScreen
 
 @Composable
-fun SetupNavGraph(navController: NavHostController = rememberNavController()){
+fun SetupNavGraph(navController: NavHostController = rememberNavController(), isDarkTheme: MutableState<Boolean>){
     NavHost(
         navController=navController,
         startDestination = Screen.Home.route
     ){
         composable(route = Screen.Home.route){
-            MainScreen(navController)
+            MainScreen(navController = navController, isDarkTheme = isDarkTheme)
         }
-        composable(route = Screen.FormBaru.route){
-            DetailScreen(navController)
+        composable(route = Screen.FormBaru.route) {
+            DetailScreen(navController = navController, isDarkTheme = isDarkTheme)
         }
         composable(route = Screen.RecycleBin.route) {
             RecycleBinScreen(navController)
@@ -35,7 +36,7 @@ fun SetupNavGraph(navController: NavHostController = rememberNavController()){
             )
         ){navBackStackEntry ->
             val id =navBackStackEntry.arguments?.getLong(KEY_ID_CATATAN)
-            DetailScreen(navController,id)
+            DetailScreen(navController = navController, isDarkTheme = isDarkTheme)
         }
     }
 }
