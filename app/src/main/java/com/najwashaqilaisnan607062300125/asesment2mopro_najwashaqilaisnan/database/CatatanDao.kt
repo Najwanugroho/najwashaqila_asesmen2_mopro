@@ -1,4 +1,4 @@
-package com.najwashaqilaisnan607062300125.asesment2_najwashaqilaisnan_mopro.database
+package com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.database
 
 import androidx.room.*
 import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.model.Catatan

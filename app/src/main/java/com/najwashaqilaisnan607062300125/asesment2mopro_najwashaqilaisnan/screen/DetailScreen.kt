@@ -26,9 +26,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -71,7 +69,7 @@ fun DetailScreen(
     val factory = ViewModelFactory(db.dao)
     val viewModel: DetailViewModel = viewModel(factory = factory)
 
-    val snackbarHostState = remember { SnackbarHostState() }
+    remember { SnackbarHostState() }
     var itemToDelete by remember { mutableStateOf<Catatan?>(null) }
 
     var moodLevel by remember { mutableStateOf("") }

@@ -2,7 +2,7 @@ package com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.scree
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.najwashaqilaisnan607062300125.asesment2_najwashaqilaisnan_mopro.database.CatatanDao
+import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.database.CatatanDao
 import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.model.Catatan
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
