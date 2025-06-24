@@ -10,21 +10,45 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.screen.DetailScreen
 import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.screen.KEY_ID_CATATAN
+import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.screen.LoginScreen
 import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.screen.MainScreen
 import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.screen.RecycleBinScreen
+import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.screen.RegisterScreen
 
 @Composable
-fun SetupNavGraph(navController: NavHostController = rememberNavController(), isDarkTheme: MutableState<Boolean>){
+fun SetupNavGraph(
+    navController: NavHostController = rememberNavController(),
+    isDarkTheme: MutableState<Boolean>
+) {
     NavHost(
-        navController=navController,
-        startDestination = Screen.Home.route
-    ){
-        composable(route = Screen.Home.route){
+        navController = navController,
+        startDestination = Screen.Login.route
+    ) {
+        composable(route = Screen.Login.route) {
+            LoginScreen(
+                navController = navController,
+                onLoginSuccess = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Login.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable(route = Screen.Register.route) {
+            RegisterScreen(onRegisterSuccess = {
+                navController.popBackStack()
+            })
+        }
+
+        composable(route = Screen.Home.route) {
             MainScreen(navController = navController, isDarkTheme = isDarkTheme)
         }
+
         composable(route = Screen.FormBaru.route) {
             DetailScreen(navController = navController, isDarkTheme = isDarkTheme)
         }
+
         composable(route = Screen.RecycleBin.route) {
             RecycleBinScreen(navController)
         }
@@ -38,7 +62,6 @@ fun SetupNavGraph(navController: NavHostController = rememberNavController(), is
             val id = navBackStackEntry.arguments?.getLong(KEY_ID_CATATAN)
             DetailScreen(navController = navController, id = id, isDarkTheme = isDarkTheme)
         }
-
-
     }
 }
+
