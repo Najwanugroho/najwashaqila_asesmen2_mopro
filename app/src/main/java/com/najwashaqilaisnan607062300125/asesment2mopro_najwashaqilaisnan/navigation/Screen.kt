@@ -3,6 +3,7 @@ package com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.navig
 import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.screen.KEY_ID_CATATAN
 
 sealed class Screen(val route: String) {
+    data object Splash : Screen("splashScreen")
     data object Login : Screen("loginScreen")
     data object Register : Screen("registerScreen")
     data object Home : Screen("mainScreen")

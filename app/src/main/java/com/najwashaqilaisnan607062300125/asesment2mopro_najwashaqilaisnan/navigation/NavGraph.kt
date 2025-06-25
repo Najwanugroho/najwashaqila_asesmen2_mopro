@@ -14,6 +14,7 @@ import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.screen
 import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.screen.MainScreen
 import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.screen.RecycleBinScreen
 import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.screen.RegisterScreen
+import com.najwashaqilaisnan607062300125.asesment2mopro_najwashaqilaisnan.screen.SplashScreen
 
 @Composable
 fun SetupNavGraph(
@@ -28,21 +29,25 @@ fun SetupNavGraph(
             LoginScreen(
                 navController = navController,
                 onLoginSuccess = {
-                    navController.navigate(Screen.Home.route) {
+                    navController.navigate(Screen.Splash.route) {
                         popUpTo(Screen.Login.route) { inclusive = true }
                     }
                 }
             )
         }
 
-        composable(route = Screen.Register.route) {
-            RegisterScreen(onRegisterSuccess = {
-                navController.popBackStack()
-            })
+        composable(route = Screen.Splash.route) {
+            SplashScreen(navController = navController)
         }
 
         composable(route = Screen.Home.route) {
             MainScreen(navController = navController, isDarkTheme = isDarkTheme)
+        }
+
+        composable(route = Screen.Register.route) {
+            RegisterScreen(onRegisterSuccess = {
+                navController.popBackStack()
+            })
         }
 
         composable(route = Screen.FormBaru.route) {
@@ -64,4 +69,3 @@ fun SetupNavGraph(
         }
     }
 }
-
