@@ -6,6 +6,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -27,39 +28,50 @@ fun LoginScreen(navController: NavController, onLoginSuccess: (Pengguna) -> Unit
     val scope = rememberCoroutineScope()
 
     Box(
-        modifier = Modifier.fillMaxSize().padding(24.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
         Card(
+            modifier = Modifier.fillMaxWidth(0.9f),
             elevation = CardDefaults.cardElevation(8.dp),
-            modifier = Modifier.fillMaxWidth(0.85f)
+            colors = CardDefaults.cardColors(
+                containerColor = Color(0xFFFFF1F8)
+            )
         ) {
             Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(24.dp)
+                modifier = Modifier.padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Login Mood Tracker", style = MaterialTheme.typography.titleLarge, modifier = Modifier.padding(bottom = 16.dp))
+                Text(
+                    "Login Mood Tracker",
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        color = Color(0xFF6A1B9A)
+                    )
+                )
 
-                // Nama (boleh dihapus kalau tidak dipakai login)
-                TextField(
+                OutlinedTextField(
                     value = nama,
                     onValueChange = { nama = it },
                     label = { Text("Nama") },
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)
+                    modifier = Modifier.fillMaxWidth()
                 )
-                TextField(
+                OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
                     label = { Text("Email") },
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)
+                    modifier = Modifier.fillMaxWidth()
                 )
-                TextField(
+                OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
                     label = { Text("Password") },
                     visualTransformation = PasswordVisualTransformation(),
-                    modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp)
+                    modifier = Modifier.fillMaxWidth()
                 )
+
                 Button(
                     onClick = {
                         scope.launch {
@@ -76,13 +88,16 @@ fun LoginScreen(navController: NavController, onLoginSuccess: (Pengguna) -> Unit
                             }
                         }
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFBA68C8)
+                    )
                 ) {
-                    Text("Login")
+                    Text("Login", color = Color.White)
                 }
-                Spacer(modifier = Modifier.height(8.dp))
+
                 TextButton(onClick = { navController.navigate(Screen.Register.route) }) {
-                    Text("Belum punya akun? Register di sini")
+                    Text("Belum punya akun? Register di sini", color = Color(0xFF6A1B9A))
                 }
             }
         }

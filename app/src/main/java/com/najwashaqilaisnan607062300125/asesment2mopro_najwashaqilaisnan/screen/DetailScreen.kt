@@ -114,7 +114,6 @@ fun DetailScreen(
                     titleContentColor = Color(0xFF6A1B9A),
                 ),
                 actions = {
-                    // ✅ Tambahkan tombol ubah tema
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(end = 8.dp)
